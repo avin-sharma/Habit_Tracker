@@ -7,12 +7,12 @@ import android.provider.BaseColumns;
  */
 public final class HabitContract {
 
+    //private constructor so that it cannot be initialized
     private HabitContract(){}
 
     public static class HabitEntry implements BaseColumns{
 
         public static final String TABLE_NAME = "habits";
-        public static final String _ID = BaseColumns._ID;
 
         public static final String COLUMN_HABIT = "habit";
         public static final String COLUMN_DESCRIPTION = "description";

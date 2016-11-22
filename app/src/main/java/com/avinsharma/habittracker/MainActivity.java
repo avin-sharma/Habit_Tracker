@@ -1,14 +1,11 @@
 package com.avinsharma.habittracker;
 
-import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.avinsharma.habittracker.data.HabitContract.HabitEntry;
 import com.avinsharma.habittracker.data.HabitDbHelper;
@@ -25,9 +22,9 @@ public class MainActivity extends AppCompatActivity {
         mHelper = new HabitDbHelper(this);
     }
 
+    // Displays number of rows and all data in rows
     private void displayDatabaseInfo(){
-        SQLiteDatabase db = mHelper.getWritableDatabase();
-        Cursor cursor = db.query(HabitEntry.TABLE_NAME,null,null,null,null,null,null);
+        Cursor cursor = mHelper.readAllHabitsData();
         String id;
         String name;
         String description;
@@ -37,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
             TextView rows = (TextView) findViewById(R.id.rows);
             TextView data = (TextView) findViewById(R.id.data);
             rows.setText("Number of rows in the table: " + cursor.getCount());
+            data.setText("");
             for (int i=0; i<cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
                 id = String.valueOf(cursor.getInt(cursor.getColumnIndex(HabitEntry._ID)));
@@ -51,15 +49,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void insert(){
-        SQLiteDatabase db = mHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(HabitEntry.COLUMN_HABIT, "Drink Water");
-        values.put(HabitEntry.COLUMN_DESCRIPTION, "Stay hydrated");
-        long newRowId = db.insert(HabitEntry.TABLE_NAME,null,values);
-        Toast.makeText(MainActivity.this, "New Row ID: " + newRowId, Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -70,7 +59,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.insert:
-                insert();
+                mHelper.insertHabit(this);
+                displayDatabaseInfo();
+                return true;
+            case R.id.delete:
+                mHelper.deleteAllHabits(this);
                 displayDatabaseInfo();
                 return true;
         }
